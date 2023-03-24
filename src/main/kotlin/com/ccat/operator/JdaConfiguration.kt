@@ -1,5 +1,7 @@
 package com.ccat.operator
 
+import com.ccat.operator.listeners.MemberJoinListener
+import com.ccat.operator.listeners.MessageListener
 import com.ccat.operator.listeners.StatusListener
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
@@ -18,7 +20,9 @@ import xyz.dynxsty.dih4jda.DIH4JDABuilder
 @Configuration
 class JdaConfiguration(
     private val env: Environment,
-    private val statusListener: StatusListener
+    private val statusListener: StatusListener,
+    private val messageListener: MessageListener,
+    private val joinListener: MemberJoinListener
 ) {
     @Bean
     fun build(): JDA {
@@ -40,6 +44,8 @@ class JdaConfiguration(
         //LISTENERS:
         //TODO: replace with Annotation
         builder.addEventListeners(statusListener)
+        builder.addEventListeners(messageListener)
+        builder.addEventListeners(joinListener)
 
         return builder.build()
     }

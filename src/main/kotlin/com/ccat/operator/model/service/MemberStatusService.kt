@@ -11,10 +11,10 @@ class MemberStatusService {
     /**
      * Get the guild specific OnlineStates
      *
-     * @param id The Guild-Id.
+     * @param guildId The ID of the Guild.
      * @return A MemberStatus Object containing user amount for each JDA.OnlineStatus
      */
-    fun getStatusByGuildId(id: Long): MemberStatus? {
-        return memberStatus[id]
+    fun getStatusByGuildId(guildId: Long): MemberStatus? {
+        return memberStatus[guildId]
     }
 }

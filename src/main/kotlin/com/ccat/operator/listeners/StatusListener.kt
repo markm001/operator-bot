@@ -15,6 +15,7 @@ class StatusListener(
 ) : ListenerAdapter() {
     /**
      * Set MemberStates for all Guild upon Initialization
+     * TODO: Analytics sent PER HOUR!
      */
     override fun onReady(event: ReadyEvent) {
         val guilds = event.jda.guilds
@@ -34,14 +35,12 @@ class StatusListener(
         val selfUID = event.jda.selfUser.idLong
 
         statusService.memberStatus[guild.idLong] = checkGuildMemberStatistics(guild, selfUID)
-
-        println(statusService.getStatusByGuildId(guild.idLong))
     }
 
     /**
      * Get the amount of Online/Idle/Dnd/Offline Members for Guild
      */
-    private fun checkGuildMemberStatistics(guild:Guild, selfUID:Long): MemberStatus {
+    private fun checkGuildMemberStatistics(guild: Guild, selfUID: Long): MemberStatus {
         val statusMap:Map<OnlineStatus, Int> = guild.members
             .filter { it.idLong != selfUID }
             .map { it.onlineStatus }

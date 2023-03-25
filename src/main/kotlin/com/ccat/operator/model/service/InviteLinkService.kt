@@ -1,11 +1,42 @@
 package com.ccat.operator.model.service
 
+import com.ccat.operator.model.entity.InviteStatisticsResponse
+import com.ccat.operator.model.entity.InviteUser
 import org.springframework.stereotype.Service
 
 @Service
 class InviteLinkService {
     private val initialInvites: MutableMap<Long, MutableMap<String, Int>> = mutableMapOf()
-    private val inviteList: MutableMap<Long, MutableMap<Long, String>> = mutableMapOf()
+    private val inviteUsers: MutableSet<InviteUser> = mutableSetOf()
+
+    /**
+     * Checks if User has used the Link before & creates Object containing userID, guildID, inviteCode
+     * Duplicate users for guild are discarded.
+     */
+    fun saveInviteUser(guildId: Long, userId:Long, inviteCode:String) {
+        val res = inviteUsers.filter { it.guildId == guildId && it.userId == userId }
+
+        if(res.isNotEmpty()) { return }
+
+        inviteUsers.add( InviteUser(
+            userId,
+            guildId,
+            inviteCode
+        ))
+    }
+
+    /**
+     * Sum Users for each Invite-Link - Get the uses for each Link of the specified GuildID
+     *
+     * @param guildId The Id of the Guild.
+     * @return Object with InviteCode and real uses
+     */
+    fun getGuildInviteStatistics(guildId: Long): List<InviteStatisticsResponse> {
+        return inviteUsers
+            .filter { it.guildId == guildId }
+            .groupBy { it.inviteCode }
+            .map { (k, v) -> InviteStatisticsResponse(k, v.size) }
+    }
 
     /**
      * Initializes all available Invite-Links and current uses for GuildID
@@ -31,21 +62,5 @@ class InviteLinkService {
         }
 
         return null
-    }
-
-    /**
-     * Increment Invite-Link uses per UserID (duplicate Users merged)
-     */
-    fun incrementInviteLinkUses(guildId: Long, code: String, userId: Long) {
-        inviteList.getOrPut(guildId) { mutableMapOf() }[userId] = code
-    }
-
-    /**
-     * Get the uses for each Invite-Link of the GuildID
-     *
-     * @return Map of InviteCode and real uses
-     */
-    private fun getInviteLinkUses(guildId: Long):Map<String, Int> {
-        return inviteList[guildId]!!.values.groupBy { it }.mapValues { it.value.size }
     }
 }

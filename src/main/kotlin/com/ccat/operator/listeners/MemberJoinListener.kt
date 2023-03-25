@@ -6,9 +6,8 @@ import net.dv8tion.jda.api.events.guild.invite.GuildInviteCreateEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import org.springframework.stereotype.Component
 
-@Component
+
 class MemberJoinListener(
     private val inviteService: InviteLinkService
 ): ListenerAdapter() {
@@ -46,10 +45,10 @@ class MemberJoinListener(
             val guildId = event.guild.idLong
 
             val invitesMap = invites.associate { it.code to it.uses }
-            val usedInviteCode:String = inviteService
+            val inviteCodeUsed: String = inviteService
                 .getUsedLinkAndIncrement(guildId, invitesMap) ?: return@queue
 
-            inviteService.incrementInviteLinkUses(guildId, usedInviteCode, userId)
+            inviteService.saveInviteUser(guildId, userId, inviteCodeUsed)
         }
     }
 }

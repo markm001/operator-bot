@@ -1,52 +1,45 @@
 package com.ccat.operator.model.service
 
-import com.ccat.operator.model.entity.MemberStatus
+import com.ccat.operator.model.entity.MemberStates
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.events.user.update.UserUpdateOnlineStatusEvent
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class MemberStatusService {
-    val memberStatus: MutableMap<Long, MemberStatus> = Collections.synchronizedMap(mutableMapOf())
+    private val guildStates: MutableList<MemberStates> = mutableListOf()
 
     /**
-     * Set MemberStates for Guild when Online Status was Updated.
+     * Initializes or updates the MemberStates Object for a particular GuildID
      */
-    fun onUserUpdateOnlineStatus(event: UserUpdateOnlineStatusEvent) {
-        val guild = event.guild
-        val selfUID = event.jda.selfUser.idLong
-
-        memberStatus[guild.idLong] = checkGuildMemberStatistics(guild.members, selfUID)
-    }
-
-    /**
-     * Get the amount of Online/Idle/Dnd/Offline Members for Guild
-     */
-    fun checkGuildMemberStatistics(guildMembers: List<Member>, selfUID: Long): MemberStatus {
-        val statusMap:Map<OnlineStatus, Int> = guildMembers
-            .filter { it.idLong != selfUID }
+    fun setMemberStatesForGuild(members: List<Member>, guildId: Long) {
+        val statusMap = members
             .map { it.onlineStatus }
             .groupingBy { it }
             .eachCount()
 
-        return MemberStatus(
-            guildMembers.size,
+        val memberStates = MemberStates(
+            guildId,
+            members.size,
             statusMap[OnlineStatus.ONLINE] ?: 0,
             statusMap[OnlineStatus.IDLE] ?: 0,
             statusMap[OnlineStatus.DO_NOT_DISTURB] ?: 0,
             statusMap[OnlineStatus.OFFLINE] ?: 0,
         )
+
+        val savedState = guildStates.firstOrNull { it.guildId == guildId }
+        val index = guildStates.indexOf(savedState)
+        if(savedState == null) guildStates.add(memberStates) else guildStates[index] = memberStates
+
     }
 
     /**
      * Get the guild specific OnlineStates
      *
      * @param guildId The ID of the Guild.
-     * @return A MemberStatus Object containing user amount for each JDA.OnlineStatus
+     * @return A MemberStates Object containing user amount for each JDA.OnlineStatus
      */
-    fun getStatusByGuildId(guildId: Long): MemberStatus? {
-        return memberStatus[guildId]
+    fun getMemberStatesByGuildId(guildId: Long): MemberStates? {
+        return guildStates.firstOrNull { it.guildId == guildId }
     }
 }

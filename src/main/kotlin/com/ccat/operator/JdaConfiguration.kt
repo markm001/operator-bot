@@ -28,12 +28,14 @@ class JdaConfiguration(
         builder.enableIntents(GatewayIntent.GUILD_MEMBERS)
         builder.enableIntents(GatewayIntent.GUILD_PRESENCES)
         builder.enableIntents(GatewayIntent.MESSAGE_CONTENT)
+        builder.enableIntents(GatewayIntent.GUILD_VOICE_STATES)
 
         //CACHING:
         builder.setMemberCachePolicy(MemberCachePolicy.ALL)
         builder.setChunkingFilter(ChunkingFilter.ALL)
         builder.enableCache(CacheFlag.ONLINE_STATUS)
         builder.enableCache(CacheFlag.ROLE_TAGS)
+        builder.enableCache(CacheFlag.VOICE_STATE)
 
         return builder.build()
     }

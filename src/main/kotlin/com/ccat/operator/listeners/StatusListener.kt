@@ -17,11 +17,11 @@ class StatusListener(
         val guilds = event.jda.guilds
         val selfUID = event.jda.selfUser.idLong
 
-        guilds.forEach {guild ->
-            val guildMembers: List<Member> = guild.members.filter { it.idLong != selfUID }
-            statusService.setMemberStatesForGuild(guildMembers, guild.idLong)
+        guilds.forEach { guild ->
+            val guildMembers: List<Member> = guild.members
+                .filter { !(it.idLong == selfUID || it.user.isBot) }
 
-            println(statusService.getMemberStatesByGuildId(guild.idLong))
+            statusService.setMemberStatesForGuild(guildMembers, guild.idLong)
         }
     }
 
@@ -29,10 +29,10 @@ class StatusListener(
         val guild = event.guild
         val selfUID = event.jda.selfUser.idLong
 
-        val guildMembers: List<Member> = guild.members.filter { it.idLong != selfUID }
-        statusService.setMemberStatesForGuild(guildMembers, guild.idLong)
+        val guildMembers: List<Member> = guild.members
+            .filter { !(it.idLong == selfUID || it.user.isBot) }
 
-        println(statusService.getMemberStatesByGuildId(guild.idLong))
+        statusService.setMemberStatesForGuild(guildMembers, guild.idLong)
     }
 
 

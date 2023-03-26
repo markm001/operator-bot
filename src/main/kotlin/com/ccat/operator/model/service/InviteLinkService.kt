@@ -26,19 +26,6 @@ class InviteLinkService {
     }
 
     /**
-     * Sum Users for each Invite-Link - Get the uses for each Link of the specified GuildID
-     *
-     * @param guildId The Id of the Guild.
-     * @return Object with InviteCode and real uses
-     */
-    fun getGuildInviteStatistics(guildId: Long): List<InviteStatisticsResponse> {
-        return inviteUsers
-            .filter { it.guildId == guildId }
-            .groupBy { it.inviteCode }
-            .map { (k, v) -> InviteStatisticsResponse(k, v.size) }
-    }
-
-    /**
      * Initializes all available Invite-Links and current uses for GuildID
      */
     fun initGuildInviteUses(guildId: Long, invites:Map<String, Int>) {
@@ -62,5 +49,18 @@ class InviteLinkService {
         }
 
         return null
+    }
+
+    /**
+     * Sum Users for each Invite-Link - Get the uses for each Link of the specified GuildID
+     *
+     * @param guildId The Id of the Guild.
+     * @return Object with InviteCode and real uses
+     */
+    fun getGuildInviteStatistics(guildId: Long): List<InviteStatisticsResponse> {
+        return inviteUsers
+            .filter { it.guildId == guildId }
+            .groupBy { it.inviteCode }
+            .map { (k, v) -> InviteStatisticsResponse(k, v.size) }
     }
 }

@@ -9,6 +9,10 @@ import org.springframework.stereotype.Service
 class VoiceChannelService {
     private val voiceChannels: MutableList<VoiceStatus> = mutableListOf()
 
+    /**
+     * Removes the specified userID from the VoiceStatus Object List of participants if it exists
+     *
+     */
     fun removeVoiceStatusMemberIfExists(guildId: Long, channelId: Long, userId: Long) {
         val voiceStatus = checkIfVoiceStatusExists(guildId, channelId)
             ?: return
@@ -16,23 +20,28 @@ class VoiceChannelService {
         voiceStatus.memberList.remove(userId)
     }
 
-    fun addOrCreateVoiceStatus(
-        guildId: Long,
-        channelJoinedId: Long,
-        channelJoined: VoiceChannel,
-        userId: Long
-    ) {
-        val voiceStatus = checkIfVoiceStatusExists(guildId, channelJoinedId)
+    /**
+     * Creates a VoiceStatus Object or modifies the existing one
+     *
+     * @param channel The VoiceChannel joined by the User
+     */
+    fun addOrCreateVoiceStatus(guildId: Long, channel: VoiceChannel, userId: Long) {
+        val voiceStatus = checkIfVoiceStatusExists(guildId, channel.idLong)
 
         if (voiceStatus == null) {
             voiceChannels.add(
-                createVoiceStatusForChannel(channelJoined)
+                createVoiceStatusForChannel(channel)
             )
         } else {
             voiceStatus.memberList.add(userId)
         }
     }
 
+    /**
+     * Create VoiceStatus Objects for each Guild on start-up
+     *
+     * @param guilds List of Guilds managed by the Bot
+     */
     fun initializeVoiceChannelActivity(guilds: List<Guild>) {
         val voiceChannelStatus = guilds.flatMap { it.voiceChannelCache }
             .filter { it.members.isNotEmpty() }
@@ -44,13 +53,22 @@ class VoiceChannelService {
     }
 
 
+    /**
+     * Check if a VoiceStatus Object has been initialized in the List
+     */
     private fun checkIfVoiceStatusExists(guildId: Long, channelId: Long): VoiceStatus? {
         return voiceChannels.firstOrNull {
             it.guildId == guildId
-                    && it.channelId == channelId
+            && it.channelId == channelId
         }
     }
 
+    /**
+     * Creates VoiceStatus Object for specific VoiceChannel
+     * Retrieves currently joined MemberIDs from Channel
+     *
+     * @param channel The corresponding VoiceChannel of the Guild
+     */
     private fun createVoiceStatusForChannel(channel: VoiceChannel): VoiceStatus {
         val guildId = channel.guild.idLong
         val channelId = channel.idLong
@@ -59,6 +77,11 @@ class VoiceChannelService {
         return VoiceStatus(guildId, channelId, memberList.toMutableList())
     }
 
+    /**
+     * Returns a List of VoiceStatus Objects for specified GuildID
+     *
+     * @param guildId The ID of the relevant Guild
+     */
     fun getVoiceChannelStatusForGuild(guildId: Long): List<VoiceStatus> {
         return voiceChannels.filter { it.guildId == guildId }
     }

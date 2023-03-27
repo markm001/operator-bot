@@ -22,8 +22,7 @@ class VoiceListener(
         val channelLeft = event.channelLeft
 
         if (channelJoined != null) {
-            val channelJoinedId = event.channelJoined!!.idLong
-            voiceService.addOrCreateVoiceStatus(guildId, channelJoinedId, channelJoined.asVoiceChannel(), userId)
+            voiceService.addOrCreateVoiceStatus(guildId, channelJoined.asVoiceChannel(), userId)
         }
 
         if (channelLeft != null) {

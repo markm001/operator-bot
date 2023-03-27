@@ -36,6 +36,7 @@ class JdaConfiguration(
         builder.enableCache(CacheFlag.ONLINE_STATUS)
         builder.enableCache(CacheFlag.ROLE_TAGS)
         builder.enableCache(CacheFlag.VOICE_STATE)
+        builder.enableCache(CacheFlag.ACTIVITY)
 
         return builder.build()
     }

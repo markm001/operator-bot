@@ -2,12 +2,30 @@ package com.ccat.operator.model.service
 
 import com.ccat.operator.model.entity.InviteStatisticsResponse
 import com.ccat.operator.model.entity.InviteUser
+import net.dv8tion.jda.api.entities.Guild
 import org.springframework.stereotype.Service
 
 @Service
 class InviteLinkService {
     private val initialInvites: MutableMap<Long, MutableMap<String, Int>> = mutableMapOf()
     private val inviteUsers: MutableSet<InviteUser> = mutableSetOf()
+
+    /**
+     * Updates the all saved Invites for the specified Guild with the retrieved values
+     * Used onReady & when new Invite is created
+     *
+     * @param guild The managed JDA.Guild
+     */
+    fun initializeInvitesForGuild(guild: Guild) {
+        val guildId = guild.idLong
+
+        guild.retrieveInvites().queue { invites ->
+            initGuildInviteUses(
+                guildId,
+                invites.associate { it.code to it.uses }
+            )
+        }
+    }
 
     /**
      * Checks if User has used the Link before & creates Object containing userID, guildID, inviteCode
@@ -28,7 +46,7 @@ class InviteLinkService {
     /**
      * Initializes all available Invite-Links and current uses for GuildID
      */
-    fun initGuildInviteUses(guildId: Long, invites:Map<String, Int>) {
+    private fun initGuildInviteUses(guildId: Long, invites:Map<String, Int>) {
         initialInvites[guildId] = invites.toMutableMap()
     }
 

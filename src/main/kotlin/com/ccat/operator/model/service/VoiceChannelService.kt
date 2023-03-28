@@ -10,6 +10,18 @@ class VoiceChannelService {
     private val voiceChannels: MutableList<VoiceStatus> = mutableListOf()
 
     /**
+     * Create VoiceStatus Objects for specified Guild on start-up
+     *
+     * @param guild A Guild managed by the Bot
+     */
+    fun initializeVoiceChannelActivityForGuild(guild: Guild) {
+        guild.voiceChannelCache
+            .filter { it.members.isNotEmpty() }
+            .map { createVoiceStatusForChannel(it) }
+            .forEach { voiceChannels.add(it) }
+    }
+
+    /**
      * Removes the specified userID from the VoiceStatus Object List of participants if it exists
      *
      */
@@ -36,22 +48,6 @@ class VoiceChannelService {
             voiceStatus.memberList.add(userId)
         }
     }
-
-    /**
-     * Create VoiceStatus Objects for each Guild on start-up
-     *
-     * @param guilds List of Guilds managed by the Bot
-     */
-    fun initializeVoiceChannelActivity(guilds: List<Guild>) {
-        val voiceChannelStatus = guilds.flatMap { it.voiceChannelCache }
-            .filter { it.members.isNotEmpty() }
-            .map {
-                return@map createVoiceStatusForChannel(it)
-            }.toMutableList()
-
-        voiceChannels.addAll(voiceChannelStatus)
-    }
-
 
     /**
      * Check if a VoiceStatus Object has been initialized in the List

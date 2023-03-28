@@ -1,12 +1,9 @@
 package com.ccat.operator.listeners
 
 import com.ccat.operator.model.service.InviteLinkService
-import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.events.guild.invite.GuildInviteCreateEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
-import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-
 
 class MemberJoinListener(
     private val inviteService: InviteLinkService
@@ -14,29 +11,8 @@ class MemberJoinListener(
     /**
      * TODO: Analytics sent PER HOUR!
      */
-    override fun onReady(event: ReadyEvent) {
-        event.jda.guilds.forEach {guild ->
-            initializeInvitesForGuild(guild)
-        }
-    }
-
     override fun onGuildInviteCreate(event: GuildInviteCreateEvent) {
-        initializeInvitesForGuild(event.guild)
-    }
-
-    /**
-     * Updates the all saved Invites for the specified Guild with the retrieved values
-     * Used onReady & when new Invite is created
-     */
-    private fun initializeInvitesForGuild(guild: Guild) {
-        val guildId = guild.idLong
-
-        guild.retrieveInvites().queue { invites ->
-            inviteService.initGuildInviteUses(
-                guildId,
-                invites.associate { it.code to it.uses }
-            )
-        }
+        inviteService.initializeInvitesForGuild(event.guild)
     }
 
     override fun onGuildMemberJoin(event: GuildMemberJoinEvent) {

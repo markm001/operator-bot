@@ -2,7 +2,6 @@ package com.ccat.operator.listeners
 
 import com.ccat.operator.model.service.GuildActivityService
 import net.dv8tion.jda.api.entities.Activity.ActivityType
-import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.events.user.UserActivityEndEvent
 import net.dv8tion.jda.api.events.user.UserActivityStartEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
@@ -13,10 +12,6 @@ class UserActivityListener(
     /**
      * TODO: Analytics sent PER HOUR!
      */
-    override fun onReady(event: ReadyEvent) {
-        activityService.initializeGuildActivities(event.jda.guilds)
-    }
-
     override fun onUserActivityStart(event: UserActivityStartEvent) {
         if(event.user.isBot) return
 

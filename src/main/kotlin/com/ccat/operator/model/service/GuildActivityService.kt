@@ -11,18 +11,16 @@ class GuildActivityService {
     private val activities: MutableList<GuildMemberActivities> = mutableListOf()
 
     /**
-     * Initializes all current ActivityType.PLAYING Activities for each managed Guild
+     * Initializes all current ActivityType.PLAYING Activities for a managed Guild
      *
-     * @param guilds List of all managed Guilds at the start-up time
+     * @param guild A managed Guild at the start-up time
      */
-    fun initializeGuildActivities(guilds: List<Guild>) {
-        val guildMemberActivities = guilds.map { guild ->
-            val memberActivities: MutableMap<Long, Activity> = getActivitiesForAllGuildMembers(guild)
+    fun initializeActivitiesForGuild(guild: Guild) {
+        val memberActivities: MutableMap<Long, Activity> = getActivitiesForAllGuildMembers(guild)
 
-            return@map GuildMemberActivities(guild.idLong, memberActivities)
-        }.toMutableList()
-
-        activities.addAll(guildMemberActivities)
+        activities.add(
+            GuildMemberActivities(guild.idLong, memberActivities)
+        )
     }
 
     /**

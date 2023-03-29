@@ -11,7 +11,7 @@ class MessageListener(
      * TODO: Analytics sent PER DAY!
      */
     override fun onMessageReceived(event: MessageReceivedEvent) {
-        if(!event.isFromGuild) return
+        if(!event.isFromGuild || event.author.isBot || event.author.isSystem) return
 
         val guildId = event.guild.idLong
         val channelId: Long = event.channel.asTextChannel().idLong

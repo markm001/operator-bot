@@ -1,6 +1,7 @@
 package com.ccat.operator.model.service
 
 import com.ccat.operator.model.entity.VoiceStatus
+import com.ccat.operator.model.entity.VoiceStatusResponse
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
 import org.springframework.stereotype.Service
@@ -78,7 +79,15 @@ class VoiceChannelService {
      *
      * @param guildId The ID of the relevant Guild
      */
-    fun getVoiceChannelStatusForGuild(guildId: Long): List<VoiceStatus> {
-        return voiceChannels.filter { it.guildId == guildId }
+    fun getVoiceChannelStatusForGuild(guildId: Long): List<VoiceStatusResponse> {
+        return voiceChannels
+            .filter { it.guildId == guildId }
+            .map {
+                VoiceStatusResponse(
+                    guildId,
+                    it.channelId,
+                    it.memberList
+                )
+            }
     }
 }

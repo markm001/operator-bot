@@ -10,8 +10,12 @@ class StatusListener(
 ) : ListenerAdapter() {
     /**
      * TODO: Analytics sent PER HOUR!
+     *
+     * TODO: Change this to only update the User Online Status, not the entire Guild
      */
     override fun onUserUpdateOnlineStatus(event: UserUpdateOnlineStatusEvent) {
+        if(event.user.isBot) return
+
         val guild = event.guild
         val selfUID = event.jda.selfUser.idLong
 

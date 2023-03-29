@@ -5,3 +5,9 @@ data class VoiceStatus (
     val channelId: Long,
     val memberList: MutableList<Long>
 )
+
+data class VoiceStatusResponse (
+    val guildId: Long,
+    val channelId: Long,
+    val memberList: MutableList<Long>
+)

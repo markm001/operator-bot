@@ -1,55 +1,74 @@
 package com.ccat.operator.listeners
 
-import com.ccat.operator.client.GithubClient
+import com.ccat.operator.model.service.MessageService
+import com.ccat.operator.model.service.ModerationService
+import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import java.net.URI
+import java.time.Duration
+import java.time.temporal.ChronoUnit
 
 /**
  * Check if Message Link contains invite or spam
  */
 class MessageModerationListener(
-    private val githubClient: GithubClient
-): ListenerAdapter() {
-    private val INVITE_URL = Regex("(https?://|http?://)?(www.)?(discord.(gg|io|me|li)|discordapp.com/invite|discord.com/invite)/[^\\s/]+?(?=\\b)")
-
-    private val URL_PATTERN = Regex("((?:http|https)(:/{2}\\w+)([/|.]?)([^\\s\"]*))",
-        setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL))
-
-
+    private val moderationService: ModerationService,
+    private val messageService: MessageService
+) : ListenerAdapter() {
     override fun onMessageReceived(event: MessageReceivedEvent) {
-        if(!event.isFromGuild || event.author.isBot || event.author.isSystem) return
+        if (!event.isFromGuild || event.author.isBot || event.author.isSystem) return
+        val member = event.member ?: return
+        val self = event.guild.selfMember
 
-        if(checkMessageContent(event.message)) event.message.delete().queue()
+        checkMessageContent(event.message, member, self)
     }
 
     override fun onMessageUpdate(event: MessageUpdateEvent) {
-        if(!event.isFromGuild || event.author.isBot || event.author.isSystem) return
+        if (!event.isFromGuild || event.author.isBot || event.author.isSystem) return
+        val member = event.member ?: return
+        val self = event.guild.selfMember
 
-        if(checkMessageContent(event.message)) event.message.delete().queue()
+        checkMessageContent(event.message, member, self)
     }
 
+    /**
+     * Check if Message Content is forbidden
+     *
+     * @param message The Guild Message sent by the member
+     * @param member The Guild Member sending the message
+     * @param self The Bot itself
+     */
+    private fun checkMessageContent(message: Message, member: Member, self: Member) {
+        val messageContent = message.contentRaw
 
-    fun checkMessageContent(message: Message): Boolean {
-        val contentRaw = message.contentRaw
+        if (messageService.checkMessageForAdvertisement(messageContent))
+            purgeMessage(
+                message, member, self,
+                Duration.of(15, ChronoUnit.MINUTES), "Advertising other discord servers."
+            )
 
-        if(INVITE_URL.containsMatchIn(contentRaw)) return true
+        if (!(messageContent.contains("http://")
+                    || messageContent.contains("https://"))) return
 
-        if (!(contentRaw.contains("http://")
-                    || contentRaw.contains("https://"))) return false
-        val cleanedString = contentRaw.replace(Regex("\\p{C}"), "")
+        if (messageService.checkMessageForMaliciousLink(messageContent))
+            purgeMessage(
+                message, member, self,
+                Duration.of(20, ChronoUnit.DAYS), "Posting forbidden links."
+            )
+    }
 
-        val match = URL_PATTERN.find(cleanedString)?: return false
-        val url = match.value.split(" ").first()
-
-        try {
-            val host = URI(url).host ?: throw Exception()
-            return githubClient.compareSuspiciousDomains(host)
-        } catch(e: Exception) {
-            e.printStackTrace()
-            throw(e)
-        }
+    /**
+     * Purges the specific message and enforces a timeout on the member
+     */
+    private fun purgeMessage(message: Message, member: Member, selfMember: Member, duration: Duration, reason: String) {
+        message.delete().queue()
+        moderationService.timeoutGuildMember(
+            member,
+            duration,
+            reason,
+            selfMember
+        )
     }
 }

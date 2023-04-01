@@ -32,7 +32,7 @@ class TimeoutCommand(
     override fun execute(event: SlashCommandInteractionEvent) {
         val member = event.member?: return
         if(!member.hasPermission(Permission.KICK_MEMBERS))
-            return event.reply("Missing perms").queue() //Todo: Missing permission in Handler
+            return ResponseHandler.missingPermissions(event).queue()
 
         val memberOption = event.getOption("member")
         val reasonOption = event.getOption("reason")
@@ -44,8 +44,8 @@ class TimeoutCommand(
             return ResponseHandler.missingArgs(event).queue()
         }
 
-        //TODO: replace with Member not found Response
-        val effectedMember = memberOption.asMember ?: return ResponseHandler.missingArgs(event).queue()
+        val effectedMember = memberOption.asMember
+            ?: return ResponseHandler.memberNotFound(event, member).queue()
 
         val timeoutDuration = Duration.of(
             durationOption.asLong,

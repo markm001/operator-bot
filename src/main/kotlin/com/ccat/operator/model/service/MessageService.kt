@@ -38,7 +38,7 @@ class MessageService(
      * @param guildId The ID of the Guild.
      * @return A MemberStatus Object containing totalMessages, channels and users with amount of interactions or NULL
      */
-    private fun getMessageInteractionsByGuildId(guildId: Long): InteractionResponse? {
+    fun getMessageInteractionsByGuildId(guildId: Long): InteractionResponse? {
         val guildInteractions = interactions[guildId] ?: return null
 
         val totalMessages = guildInteractions.userList.values.sum()

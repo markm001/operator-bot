@@ -3,14 +3,18 @@ package com.ccat.operator.listeners
 import com.ccat.operator.model.service.InviteLinkService
 import net.dv8tion.jda.api.events.guild.invite.GuildInviteCreateEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
+import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class MemberJoinListener(
     private val inviteService: InviteLinkService
 ): ListenerAdapter() {
-    /**
-     * TODO: Analytics sent PER HOUR!
-     */
+    override fun onReady(event: ReadyEvent) {
+        event.jda.guilds.forEach {
+            inviteService.initializeInvitesForGuild(it)
+        }
+    }
+
     override fun onGuildInviteCreate(event: GuildInviteCreateEvent) {
         inviteService.initializeInvitesForGuild(event.guild)
     }

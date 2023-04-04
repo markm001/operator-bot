@@ -10,7 +10,7 @@ object TimestampUtils {
      * Sets the Timestamp to the current time
      */
     fun setCurrentTime() {
-        currentTimeString = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS).toString()
+        currentTimeString = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).toString()
     }
 
     fun getCurrentTime():String {

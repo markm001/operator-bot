@@ -22,7 +22,16 @@ class FirebaseClient(
             }
         } catch (e: RestClientException) {
             e.printStackTrace()
-            throw(e)
+            throw (e)
+        }
+    }
+
+    fun sendDailyAnalytics(guildId: Long, messageAnalytics: InteractionResponse) {
+        try {
+            restTemplate.postForObject("$firebaseApiKey/message/$guildId.json", messageAnalytics, String::class.java)
+        } catch (e: RestClientException) {
+            e.printStackTrace()
+            throw (e)
         }
     }
 }

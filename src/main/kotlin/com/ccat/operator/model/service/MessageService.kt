@@ -50,6 +50,10 @@ class MessageService(
         )
     }
 
+    fun flushMessageInteractions(guildId: Long) {
+        interactions.remove(guildId)
+    }
+
 
     /**
      * Checks if message contains a server advertisement link, such as: discord.gg/xyz

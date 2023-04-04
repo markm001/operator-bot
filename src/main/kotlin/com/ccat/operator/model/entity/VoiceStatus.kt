@@ -6,8 +6,12 @@ data class VoiceStatus (
     val memberList: MutableList<Long>
 )
 
-data class VoiceStatusResponse (
-    val guildId: Long,
+data class VoiceChannelActivity (
     val channelId: Long,
     val memberList: MutableList<Long>
 )
+
+data class VoiceStatusDto (
+    val timestamp: String,
+    val channelActivities: List<VoiceChannelActivity>
+): AnalyticsDataObject

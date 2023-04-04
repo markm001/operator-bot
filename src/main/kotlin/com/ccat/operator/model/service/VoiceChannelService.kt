@@ -1,13 +1,15 @@
 package com.ccat.operator.model.service
 
+import com.ccat.operator.model.entity.VoiceChannelActivity
 import com.ccat.operator.model.entity.VoiceStatus
-import com.ccat.operator.model.entity.VoiceStatusResponse
+import com.ccat.operator.model.entity.VoiceStatusDto
+import com.ccat.operator.utils.TimestampUtils
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
 import org.springframework.stereotype.Service
 
 @Service
-class VoiceChannelService {
+class VoiceChannelService{
     private val voiceChannels: MutableList<VoiceStatus> = mutableListOf()
 
     /**
@@ -24,13 +26,15 @@ class VoiceChannelService {
 
     /**
      * Removes the specified userID from the VoiceStatus Object List of participants if it exists
-     *
+     * Removes VoiceState from List if no members are currently present
      */
     fun removeVoiceStatusMemberIfExists(guildId: Long, channelId: Long, userId: Long) {
         val voiceStatus = checkIfVoiceStatusExists(guildId, channelId)
             ?: return
 
         voiceStatus.memberList.remove(userId)
+
+        if(voiceStatus.memberList.isEmpty()) voiceChannels.remove(voiceStatus)
     }
 
     /**
@@ -79,15 +83,21 @@ class VoiceChannelService {
      *
      * @param guildId The ID of the relevant Guild
      */
-    fun getVoiceChannelStatusForGuild(guildId: Long): List<VoiceStatusResponse> {
-        return voiceChannels
+    fun getVoiceChannelStatusForGuild(guildId: Long): VoiceStatusDto? {
+        val channelActivity = voiceChannels
             .filter { it.guildId == guildId }
             .map {
-                VoiceStatusResponse(
-                    guildId,
+                VoiceChannelActivity(
                     it.channelId,
                     it.memberList
                 )
             }
+
+        if(channelActivity.isEmpty()) return null
+
+        return VoiceStatusDto(
+            TimestampUtils.getCurrentTime(),
+            channelActivity
+        )
     }
 }

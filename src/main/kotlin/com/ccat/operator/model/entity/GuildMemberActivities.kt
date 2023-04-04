@@ -7,7 +7,9 @@ data class GuildMemberActivities (
     val activityList: MutableMap<Long, Activity>
 )
 
-data class MemberActivityResponse (
-    val name: String,
-    val totalMembers: Int
-)
+data class MemberActivityDto (
+    val timestamp: String,
+    val usersPerActivity: Map<String, Int>
+): AnalyticsDataObject
+
+interface AnalyticsDataObject { }

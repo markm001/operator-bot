@@ -1,7 +1,8 @@
 package com.ccat.operator.model.service
 
-import com.ccat.operator.model.entity.InviteStatisticsResponse
+import com.ccat.operator.model.entity.InviteStatisticsDto
 import com.ccat.operator.model.entity.InviteUser
+import com.ccat.operator.utils.TimestampUtils
 import net.dv8tion.jda.api.entities.Guild
 import org.springframework.stereotype.Service
 
@@ -75,10 +76,17 @@ class InviteLinkService {
      * @param guildId The Id of the Guild.
      * @return Object with InviteCode and real uses
      */
-    fun getGuildInviteStatistics(guildId: Long): List<InviteStatisticsResponse> {
-        return inviteUsers
+    fun getGuildInviteStatistics(guildId: Long): InviteStatisticsDto? {
+        val inviteStatistics: Map<String, Int> = inviteUsers
             .filter { it.guildId == guildId }
             .groupBy { it.inviteCode }
-            .map { (k, v) -> InviteStatisticsResponse(k, v.size) }
+            .mapValues { it.value.size }
+
+        if(inviteStatistics.isEmpty()) return null
+
+        return InviteStatisticsDto(
+            TimestampUtils.getCurrentTime(),
+            inviteStatistics
+        )
     }
 }

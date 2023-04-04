@@ -1,7 +1,8 @@
 package com.ccat.operator.model.service
 
 import com.ccat.operator.model.entity.GuildMemberActivities
-import com.ccat.operator.model.entity.MemberActivityResponse
+import com.ccat.operator.model.entity.MemberActivityDto
+import com.ccat.operator.utils.TimestampUtils
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.entities.Guild
 import org.springframework.stereotype.Service
@@ -76,15 +77,20 @@ class GuildActivityService {
      *
      * @param guildId The ID of the Guild
      * @return MemberActivityResponse containing activity name & amount of Players
-     * or an empty List if the guildID wasn't initialized
+     * or an empty List if the guildID wasn't initialized or activities are empty
      */
-    fun getGuildActivitiesForGuild(guildId: Long): List<MemberActivityResponse> {
-        val guildActivities = activities.firstOrNull { it.guildId == guildId }
-            ?: return emptyList()
+    fun getGuildActivitiesForGuild(guildId: Long): MemberActivityDto? {
+        val guildActivities = activities.firstOrNull { it.guildId == guildId }?: return null
 
-        return guildActivities.activityList.values
+        val memberActivities = guildActivities.activityList.values
             .groupingBy { it.name }
             .eachCount()
-            .map { MemberActivityResponse(it.key, it.value) }
+
+        if(activities.isEmpty()) return null
+
+        return MemberActivityDto(
+            TimestampUtils.getCurrentTime(),
+            memberActivities
+        )
     }
 }

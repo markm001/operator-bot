@@ -6,7 +6,7 @@ data class InviteUser (
     val inviteCode: String
 )
 
-data class InviteStatisticsResponse (
-    val inviteCode: String,
-    val usesAmount: Int
-)
+data class InviteStatisticsDto (
+    val timestamp: String,
+    val usesPerInviteCode: Map<String, Int>
+): AnalyticsDataObject

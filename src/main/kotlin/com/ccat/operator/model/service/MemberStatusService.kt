@@ -1,6 +1,8 @@
 package com.ccat.operator.model.service
 
 import com.ccat.operator.model.entity.MemberStates
+import com.ccat.operator.model.entity.MemberStatesDto
+import com.ccat.operator.utils.TimestampUtils
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Member
 import org.springframework.stereotype.Service
@@ -11,6 +13,9 @@ class MemberStatusService {
 
     /**
      * Initializes or updates the MemberStates Object for a particular GuildID
+     *
+     * @param members The List of JDA.Guild Members
+     * @param guildId The Guild ID
      */
     fun setMemberStatesForGuild(members: List<Member>, guildId: Long) {
         val statusMap = members
@@ -37,9 +42,17 @@ class MemberStatusService {
      * Get the guild specific OnlineStates
      *
      * @param guildId The ID of the Guild.
-     * @return A MemberStates Object containing user amount for each JDA.OnlineStatus
+     * @return A MemberStatesDto Object containing user amount for each JDA.OnlineStatus & Timestamp
      */
-    fun getMemberStatesByGuildId(guildId: Long): MemberStates? {
-        return guildStates.firstOrNull { it.guildId == guildId }
+    fun getMemberStatesByGuildId(guildId: Long): MemberStatesDto? {
+        val states = guildStates.firstOrNull { it.guildId == guildId }?: return null
+
+        return MemberStatesDto(
+            TimestampUtils.getCurrentTime(),
+            states.total,
+            states.online,
+            states.idle,
+            states.dnd
+        )
     }
 }

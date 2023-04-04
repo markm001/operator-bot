@@ -23,6 +23,8 @@ dependencies {
 
 	implementation("net.dv8tion:JDA:5.0.0-beta.6")
 	implementation("xyz.dynxsty:dih4jda:1.6.2")
+
+	implementation("com.google.code.gson:gson:2.10.1")
 }
 
 tasks.withType<KotlinCompile> {

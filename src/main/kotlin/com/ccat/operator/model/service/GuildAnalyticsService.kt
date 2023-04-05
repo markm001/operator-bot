@@ -1,7 +1,7 @@
 package com.ccat.operator.model.service
 
 import com.ccat.operator.model.entity.AnalyticsDataObject
-import com.ccat.operator.model.entity.InteractionResponse
+import com.ccat.operator.model.entity.MessageInteractionsDto
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.entities.Guild
@@ -17,6 +17,12 @@ class GuildAnalyticsService(
     private val inviteService: InviteLinkService,
     private val messageService: MessageService
 ) {
+    /**
+     * Retrieves a Snapshot of the current Analytics for the specified Guild
+     *
+     * @param guild The JDA.Guild
+     * @return A map relating the API endpoint name and AnalyticsObject for Firebase
+     */
     fun getGuildSnapshot(guild: Guild): MutableMap<String, AnalyticsDataObject> {
         val analyticsJobs: MutableMap<String, AnalyticsDataObject> = mutableMapOf()
 
@@ -44,7 +50,13 @@ class GuildAnalyticsService(
         return analyticsJobs
     }
 
-    fun getMessageAnalytics(guildId: Long): InteractionResponse? {
+    /**
+     * Retrieves, then flushes all Message Interactions for the specified GuildId
+     *
+     * @param guildId The Id for the JDA.Guild
+     * @return Object containing Message Interactions for the current time.
+     */
+    fun getMessageAnalytics(guildId: Long): MessageInteractionsDto? {
         val interactions = messageService.getMessageInteractionsByGuildId(guildId)
         messageService.flushMessageInteractions(guildId)
 

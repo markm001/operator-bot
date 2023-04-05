@@ -5,7 +5,8 @@ data class GuildInteraction (
     val userList: MutableMap<Long, Int>
 )
 
-data class InteractionResponse(
+data class MessageInteractionsDto(
+    val timestamp: String,
     val totalMessages: Int,
     val uniqueChannels: Map<Long, Int>,
     val uniqueUsers: Map<Long, Int>

@@ -13,7 +13,13 @@ class FirebaseClient(
 ) {
     val restTemplate = RestTemplate()
 
-    fun writeHourlyAnalytics(guildId: Long, analyticsJobs: MutableMap<String, AnalyticsDataObject>) {
+    /**
+     * Writes the Hourly Analytics to the Database
+     *
+     * @param guildId The Id of the JDA.Guild
+     * @param analyticsJobs A map relating the endpoint and Object containing the Analytics Data
+     */
+    fun writeHourlyAnalytics(guildId: Long, analyticsJobs: Map<String, AnalyticsDataObject>) {
         try {
             analyticsJobs.forEach {
                 val endpoint = it.key
@@ -26,7 +32,13 @@ class FirebaseClient(
         }
     }
 
-    fun sendDailyAnalytics(guildId: Long, messageAnalytics: InteractionResponse) {
+    /**
+     * Writes the Daily Analytics to the Database
+     *
+     * @param guildId The Id of the JDA.Guild
+     * @param messageAnalytics The Object containing all Message Interactions for the specific day
+     */
+    fun sendDailyAnalytics(guildId: Long, messageAnalytics: MessageInteractionsDto) {
         try {
             restTemplate.postForObject("$firebaseApiKey/message/$guildId.json", messageAnalytics, String::class.java)
         } catch (e: RestClientException) {

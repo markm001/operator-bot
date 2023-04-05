@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service
 
 @Service
 class MemberStatusService {
+    /**
+     * @param members A List containing all Members of a Guild
+     * @return JDA.OnlineStatus for all Members (excluding offline) contained within a MemberStates Object
+     */
     fun getMemberStates(members: List<Member>): MemberStatesDto {
         val statusMap = members
             .map { it.onlineStatus }

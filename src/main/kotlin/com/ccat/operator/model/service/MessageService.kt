@@ -2,7 +2,8 @@ package com.ccat.operator.model.service
 
 import com.ccat.operator.client.GithubClient
 import com.ccat.operator.model.entity.GuildInteraction
-import com.ccat.operator.model.entity.InteractionResponse
+import com.ccat.operator.model.entity.MessageInteractionsDto
+import com.ccat.operator.utils.TimestampUtils
 import org.springframework.stereotype.Service
 import java.net.URI
 
@@ -38,18 +39,24 @@ class MessageService(
      * @param guildId The ID of the Guild.
      * @return A MemberStatus Object containing totalMessages, channels and users with amount of interactions or NULL
      */
-    fun getMessageInteractionsByGuildId(guildId: Long): InteractionResponse? {
+    fun getMessageInteractionsByGuildId(guildId: Long): MessageInteractionsDto? {
         val guildInteractions = interactions[guildId] ?: return null
 
         val totalMessages = guildInteractions.userList.values.sum()
 
-        return InteractionResponse(
+        return MessageInteractionsDto(
+            TimestampUtils.getCurrentTime(),
             totalMessages,
             guildInteractions.channelList,
             guildInteractions.userList
         )
     }
 
+    /**
+     * Flush all saved messages for the specified Guild
+     *
+     * @param guildId The Id of the JDA.Guild
+     */
     fun flushMessageInteractions(guildId: Long) {
         interactions.remove(guildId)
     }
@@ -64,6 +71,7 @@ class MessageService(
     fun checkMessageForAdvertisement(messageContent: String): Boolean {
         return INVITE_URL.containsMatchIn(messageContent)
     }
+
     /**
      * Checks if message contains a URL and if it is a malicious Link by comparing to a maintained List.
      *

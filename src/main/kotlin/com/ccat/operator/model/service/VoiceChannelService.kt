@@ -8,6 +8,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class VoiceChannelService {
+    /**
+     * @param guild The JDA.Guild
+     * @return A List of Voice-Channel Activities for a Guild containing the Channel-Id
+     * and currently participating members
+     */
     fun getVoiceChannelActivity(guild:Guild): List<VoiceChannelActivity> {
         return guild.voiceChannelCache
             .filter { it.members.isNotEmpty() }

@@ -86,7 +86,7 @@ class MessageService(
 
         try {
             val host = URI(url).host ?: throw Exception()
-            return githubClient.compareSuspiciousDomains(host)
+            return githubClient.retrieveBannedDomains().split("\n").contains(host)
         } catch(e: Exception) {
             //TODO: Log this
             e.printStackTrace()

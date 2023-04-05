@@ -24,7 +24,8 @@ dependencies {
 	implementation("net.dv8tion:JDA:5.0.0-beta.6")
 	implementation("xyz.dynxsty:dih4jda:1.6.2")
 
-	implementation("com.google.code.gson:gson:2.10.1")
+	implementation("org.springframework.boot:spring-boot-starter-cache:3.0.5")
+	implementation("com.github.ben-manes.caffeine:caffeine:3.1.5")
 }
 
 tasks.withType<KotlinCompile> {

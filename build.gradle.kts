@@ -26,6 +26,8 @@ dependencies {
 
 	implementation("org.springframework.boot:spring-boot-starter-cache:3.0.5")
 	implementation("com.github.ben-manes.caffeine:caffeine:3.1.5")
+
+	implementation("io.github.oshai:kotlin-logging-jvm:4.0.0-beta-22")
 }
 
 tasks.withType<KotlinCompile> {

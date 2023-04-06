@@ -30,6 +30,5 @@ class BotConfiguration(
         }
 
         diH4JDA.registerInteractions()
-
     }
 }

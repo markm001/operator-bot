@@ -3,6 +3,7 @@ package com.ccat.operator.model.service
 import com.ccat.operator.client.GithubClient
 import com.ccat.operator.model.entity.GuildInteraction
 import com.ccat.operator.model.entity.MessageInteractionsDto
+import com.ccat.operator.utils.ErrorLogger
 import com.ccat.operator.utils.TimestampUtils
 import org.springframework.stereotype.Service
 import java.net.URI
@@ -88,8 +89,7 @@ class MessageService(
             val host = URI(url).host ?: throw Exception()
             return githubClient.retrieveBannedDomains().split("\n").contains(host)
         } catch(e: Exception) {
-            //TODO: Log this
-            e.printStackTrace()
+            ErrorLogger.catch(e)
             throw(e)
         }
     }

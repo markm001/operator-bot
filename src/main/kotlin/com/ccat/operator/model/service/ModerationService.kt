@@ -1,5 +1,6 @@
 package com.ccat.operator.model.service
 
+import com.ccat.operator.utils.ErrorLogger
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.Member
 import org.springframework.stereotype.Service
@@ -17,7 +18,7 @@ class ModerationService {
      * @param reason The reason for the timeout
      * @param moderator The moderator who enforced the timeout
      */
-    fun timeoutGuildMember(member: Member, duration: Duration, reason:String, moderator: Member) {
+    fun timeoutGuildMember(member: Member, duration: Duration, reason: String, moderator: Member) {
         val guild = member.guild
         val timeoutEmbed = EmbedBuilder()
             .setColor(Color.red)
@@ -30,9 +31,10 @@ class ModerationService {
             .build()
 
         guild.timeoutFor(member, duration).queue {
-            member.user.openPrivateChannel().queue{
-                it.sendMessageEmbeds(timeoutEmbed).queue()
-            }
+            member.user.openPrivateChannel().queue (
+                { it.sendMessageEmbeds(timeoutEmbed).queue() },
+                { ErrorLogger.catch(it) }
+            )
         }
     }
 }

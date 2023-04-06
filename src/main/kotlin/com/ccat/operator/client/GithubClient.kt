@@ -1,5 +1,6 @@
 package com.ccat.operator.client
 
+import com.ccat.operator.utils.ErrorLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
@@ -18,7 +19,7 @@ class GithubClient(
         try {
             return restTemplate.getForEntity<String>(baseUrl).body?: throw Exception()
         } catch (e: Exception) {
-            e.printStackTrace()
+            ErrorLogger.catch(e)
             throw e
         }
     }

@@ -1,6 +1,7 @@
 package com.ccat.operator.client
 
 import com.ccat.operator.model.entity.*
+import com.ccat.operator.utils.ErrorLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClientException
@@ -27,7 +28,7 @@ class FirebaseClient(
                 restTemplate.postForObject("$firebaseApiKey/$endpoint/$guildId.json", data, String::class.java)
             }
         } catch (e: RestClientException) {
-            e.printStackTrace()
+            ErrorLogger.catch(e)
             throw (e)
         }
     }
@@ -43,6 +44,7 @@ class FirebaseClient(
             restTemplate.postForObject("$firebaseApiKey/message/$guildId.json", messageAnalytics, String::class.java)
         } catch (e: RestClientException) {
             e.printStackTrace()
+            ErrorLogger.catch(e)
             throw (e)
         }
     }
